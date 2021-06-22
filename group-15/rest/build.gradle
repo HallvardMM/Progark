@@ -1,0 +1,54 @@
+sourceCompatibility = 1.8
+sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.resources.srcDirs = ["./assets"]
+
+project.ext.mainClassName = "com.tdt4240.paint2win.rest.RESTApiServer"
+project.ext.assetsDir = new File("./assets")
+
+
+task run(dependsOn: classes, type: JavaExec) {
+    main = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = project.assetsDir
+    ignoreExitValue = true
+}
+
+task debug(dependsOn: classes, type: JavaExec) {
+    main = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = project.assetsDir
+    ignoreExitValue = true
+    debug = true
+}
+
+configurations {
+    extraLibs
+}
+
+task dist(type: Jar) {
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+    dependsOn configurations.runtimeClasspath
+    dependsOn configurations.extraLibs
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+}
+
+
+dist.dependsOn classes
+
+eclipse.project.name = appName + "-rest"
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.4.5'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.4.5'
+    runtimeOnly 'mysql:mysql-connector-java:8.0.23'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.4.5'
+    configurations.extraLibs.extendsFrom(configurations.implementation)
+    configurations.extraLibs.extendsFrom(configurations.runtimeOnly)
+}

@@ -1,0 +1,9 @@
+FROM mysql:8.0
+
+ENV MYSQL_DATABASE=paint2win \
+    MYSQL_ROOT_PASSWORD=Paint2Win \
+    MYSQL_ROOT_HOST=% 
+
+EXPOSE 3306
+
+ADD ./Dockerfiles/schema.sql /docker-entrypoint-initdb.d
